@@ -1,11 +1,15 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import StudentGrid from "@/components/StudentGrid";
 
 const Index = () => {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background">
-      <div className="text-center">
-        <h1 className="mb-4 text-4xl font-bold">Welcome to Your Blank App</h1>
-        <p className="text-xl text-muted-foreground">Start building your amazing project here!</p>
+    <div className="min-h-screen bg-background">
+      {/* Cyberpunk background pattern */}
+      <div className="fixed inset-0 opacity-20 pointer-events-none">
+        <div className="absolute inset-0 bg-[linear-gradient(90deg,transparent_24%,rgba(0,255,255,0.03)_25%,rgba(0,255,255,0.03)_26%,transparent_27%,transparent_74%,rgba(0,255,255,0.03)_75%,rgba(0,255,255,0.03)_76%,transparent_77%,transparent),linear-gradient(transparent_24%,rgba(255,0,255,0.03)_25%,rgba(255,0,255,0.03)_26%,transparent_27%,transparent_74%,rgba(255,0,255,0.03)_75%,rgba(255,0,255,0.03)_76%,transparent_77%,transparent)] bg-[length:50px_50px]" />
+      </div>
+      
+      <div className="relative container mx-auto px-4 py-8">
+        <StudentGrid />
       </div>
     </div>
   );

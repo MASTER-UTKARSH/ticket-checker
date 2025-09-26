@@ -1,1 +1,21 @@
 project_id = "hjkdngoufsbvkaqtbqyg"
+
+[api]
+enabled = true
+port = 54321
+schemas = ["public"]
+extra_search_path = ["public"]
+max_rows = 1000
+
+[db]
+port = 54322
+
+[studio]
+enabled = true
+port = 54323
+
+[functions.get-students]
+verify_jwt = false
+
+[functions.verify-student] 
+verify_jwt = false

@@ -2,41 +2,68 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
+/* Cyberpunk Neon Design System - All colors, gradients, fonts, etc defined here. 
 All colors MUST be HSL.
 */
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    /* Cyberpunk Dark Theme */
+    --background: 240 10% 3.9%;
+    --foreground: 180 100% 90%;
 
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card: 240 10% 6%;
+    --card-foreground: 180 100% 90%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover: 240 10% 6%;
+    --popover-foreground: 180 100% 90%;
 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+    /* Neon Cyan Primary */
+    --primary: 180 100% 50%;
+    --primary-foreground: 240 10% 3.9%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    /* Electric Purple Secondary */
+    --secondary: 280 100% 70%;
+    --secondary-foreground: 240 10% 3.9%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --muted: 240 8% 15%;
+    --muted-foreground: 180 50% 60%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    /* Hot Pink Accent */
+    --accent: 320 100% 65%;
+    --accent-foreground: 240 10% 3.9%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    /* Neon Red Destructive */
+    --destructive: 0 100% 50%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    /* Success Green */
+    --success: 120 100% 40%;
+    --success-foreground: 0 0% 100%;
 
-    --radius: 0.5rem;
+    --border: 240 20% 20%;
+    --input: 240 15% 8%;
+    --ring: 180 100% 50%;
+
+    --radius: 0.75rem;
+
+    /* Cyberpunk Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(180 100% 50%), hsl(280 100% 70%));
+    --gradient-secondary: linear-gradient(135deg, hsl(280 100% 70%), hsl(320 100% 65%));
+    --gradient-neon: linear-gradient(90deg, hsl(180 100% 50%), hsl(320 100% 65%), hsl(280 100% 70%));
+    --gradient-dark: linear-gradient(135deg, hsl(240 10% 3.9%), hsl(240 15% 8%));
+
+    /* Glowing Shadows */
+    --shadow-cyan: 0 0 20px hsl(180 100% 50% / 0.5), 0 0 40px hsl(180 100% 50% / 0.3);
+    --shadow-purple: 0 0 20px hsl(280 100% 70% / 0.5), 0 0 40px hsl(280 100% 70% / 0.3);
+    --shadow-pink: 0 0 20px hsl(320 100% 65% / 0.5), 0 0 40px hsl(320 100% 65% / 0.3);
+    --shadow-success: 0 0 20px hsl(120 100% 40% / 0.5), 0 0 40px hsl(120 100% 40% / 0.3);
+    --shadow-destructive: 0 0 20px hsl(0 100% 50% / 0.5), 0 0 40px hsl(0 100% 50% / 0.3);
+
+    /* Animation Timing */
+    --transition-fast: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-bounce: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
 
     --sidebar-background: 0 0% 98%;
 
@@ -56,33 +83,34 @@ All colors MUST be HSL.
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
+    /* Same as root since we're always dark themed */
+    --background: 240 10% 3.9%;
+    --foreground: 180 100% 90%;
 
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
+    --card: 240 10% 6%;
+    --card-foreground: 180 100% 90%;
 
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
+    --popover: 240 10% 6%;
+    --popover-foreground: 180 100% 90%;
 
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
+    --primary: 180 100% 50%;
+    --primary-foreground: 240 10% 3.9%;
 
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
+    --secondary: 280 100% 70%;
+    --secondary-foreground: 240 10% 3.9%;
 
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
+    --muted: 240 8% 15%;
+    --muted-foreground: 180 50% 60%;
 
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
+    --accent: 320 100% 65%;
+    --accent-foreground: 240 10% 3.9%;
 
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 100% 50%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
+    --border: 240 20% 20%;
+    --input: 240 15% 8%;
+    --ring: 180 100% 50%;
     --sidebar-background: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;
     --sidebar-primary: 224.3 76.3% 48%;
@@ -100,6 +128,86 @@ All colors MUST be HSL.
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-mono;
+    background-image: 
+      radial-gradient(circle at 25% 25%, hsl(180 100% 50% / 0.1) 0%, transparent 50%),
+      radial-gradient(circle at 75% 75%, hsl(320 100% 65% / 0.1) 0%, transparent 50%);
+  }
+
+  /* Cyberpunk Utility Classes */
+  .glow-text {
+    text-shadow: 0 0 10px currentColor, 0 0 20px currentColor;
+  }
+
+  .glow-border {
+    box-shadow: 0 0 0 1px currentColor, var(--shadow-cyan);
+  }
+
+  .glow-cyan {
+    box-shadow: var(--shadow-cyan);
+  }
+
+  .glow-purple {
+    box-shadow: var(--shadow-purple);
+  }
+
+  .glow-pink {
+    box-shadow: var(--shadow-pink);
+  }
+
+  .glow-success {
+    box-shadow: var(--shadow-success);
+  }
+
+  .glow-destructive {
+    box-shadow: var(--shadow-destructive);
+  }
+
+  .gradient-text {
+    background: var(--gradient-neon);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .cyberpunk-border {
+    position: relative;
+    border: 1px solid hsl(var(--border));
+  }
+
+  .cyberpunk-border::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    background: var(--gradient-primary);
+    border-radius: inherit;
+    z-index: -1;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .cyberpunk-border:hover::before {
+    opacity: 1;
+  }
+
+  /* Scrollbar styling */
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: hsl(var(--background));
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: hsl(var(--primary));
+    border-radius: 4px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--accent));
   }
 }
