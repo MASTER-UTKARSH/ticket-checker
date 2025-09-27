@@ -1,194 +1,28 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Student Verification Matrix</title>
-    <link rel="stylesheet" href="styles.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TICKET-CHECKER</title>
+    <meta name="description" content="hehe...">
+    <meta name="author" content="Lovable" />
+
+    
+    
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="https://lovable.dev/opengraph-image-p98pqg.png" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content="@lovable_dev" />
+    <meta name="twitter:image" content="https://lovable.dev/opengraph-image-p98pqg.png" />
+    <meta property="og:title" content="TICKET-CHECKER">
+  <meta name="twitter:title" content="TICKET-CHECKER">
+  <meta property="og:description" content="hehe...">
+  <meta name="twitter:description" content="hehe...">
 </head>
-<body>
-    <!-- Background Pattern -->
-    <div class="background-pattern"></div>
-    
-    <!-- Main Container -->
-    <div class="container">
-        <!-- Header -->
-        <div class="header">
-            <div class="header-info">
-                <h1 class="title">STUDENT VERIFICATION MATRIX</h1>
-                <div class="meta-info">
-                    <div class="meta-item">
-                        <i data-lucide="users"></i>
-                        <span id="totalStudents">0 Students</span>
-                    </div>
-                    <div class="meta-item">
-                        <i data-lucide="clock"></i>
-                        <span id="lastUpdated">Loading...</span>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="controls">
-                <!-- Search and Filter -->
-                <div class="search-filter-container">
-                    <div class="search-container">
-                        <i data-lucide="search"></i>
-                        <input 
-                            type="text" 
-                            id="searchInput" 
-                            placeholder="Search by enrollment..."
-                            class="search-input"
-                        >
-                    </div>
-                    
-                    <select id="sortFilter" class="sort-select">
-                        <option value="all">All Students</option>
-                        <option value="paid">Paid Only</option>
-                        <option value="unpaid">Unpaid Only</option>
-                    </select>
-                </div>
-                
-                <!-- Status Stats -->
-                <div class="status-stats">
-                    <div class="stat verified">
-                        <span>✓ <span id="verifiedCount">0</span></span>
-                    </div>
-                    <div class="stat failed">
-                        <span>✗ <span id="failedCount">0</span></span>
-                    </div>
-                    <div class="stat pending">
-                        <span>◯ <span id="pendingCount">0</span></span>
-                    </div>
-                </div>
-                
-                <!-- Refresh Button -->
-                <button id="refreshBtn" class="refresh-btn">
-                    <i data-lucide="refresh-cw"></i>
-                    <span class="refresh-text">REFRESH</span>
-                </button>
-            </div>
-        </div>
-        
-        <!-- Loading State -->
-        <div id="loadingState" class="loading-state hidden">
-            <div class="loading-content">
-                <i data-lucide="database" class="loading-icon"></i>
-                <div class="loading-text">
-                    <p class="loading-title">ACCESSING DATABASE...</p>
-                    <p class="loading-subtitle">Establishing secure connection</p>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Error State -->
-        <div id="errorState" class="error-state hidden">
-            <div class="error-content">
-                <i data-lucide="database" class="error-icon"></i>
-                <div class="error-text">
-                    <h3>CONNECTION FAILED</h3>
-                    <p>Unable to access student database</p>
-                </div>
-                <button id="retryBtn" class="retry-btn">
-                    <i data-lucide="refresh-cw"></i>
-                    RETRY CONNECTION
-                </button>
-            </div>
-        </div>
-        
-        <!-- Results Info -->
-        <div id="resultsInfo" class="results-info hidden">
-            <p id="resultsText"></p>
-        </div>
-        
-        <!-- Students Grid -->
-        <div id="studentsGrid" class="students-grid hidden"></div>
-        
-        <!-- Empty Search Results -->
-        <div id="emptyResults" class="empty-results hidden">
-            <i data-lucide="search" class="empty-icon"></i>
-            <h3>NO MATCHES FOUND</h3>
-            <p>No students match your search criteria</p>
-            <button id="clearFiltersBtn" class="clear-filters-btn">
-                Clear Filters
-            </button>
-        </div>
-        
-        <!-- Empty State -->
-        <div id="emptyState" class="empty-state hidden">
-            <i data-lucide="users" class="empty-icon"></i>
-            <h3>NO STUDENTS FOUND</h3>
-            <p>Database contains no student records</p>
-        </div>
-    </div>
-    
-    <!-- Verification Modal -->
-    <div id="verifyModal" class="modal-overlay hidden">
-        <div class="modal-content">
-            <div class="modal-background"></div>
-            
-            <div class="modal-header">
-                <i data-lucide="shield" class="modal-icon"></i>
-                <h2 class="modal-title">IDENTITY VERIFICATION</h2>
-            </div>
-            
-            <div class="modal-body">
-                <!-- Student Info Panel -->
-                <div class="student-info-panel">
-                    <div class="panel-header">
-                        <i data-lucide="zap"></i>
-                        <span>TARGET IDENTITY</span>
-                    </div>
-                    <div class="panel-content">
-                        <p id="modalStudentName" class="student-name"></p>
-                        <p id="modalStudentId" class="student-id"></p>
-                    </div>
-                </div>
-                
-                <!-- Verification Form -->
-                <form id="verifyForm" class="verify-form">
-                    <div class="form-group">
-                        <label for="uniqueCodeInput" class="form-label">ACCESS CODE</label>
-                        <div class="input-container">
-                            <input 
-                                type="password" 
-                                id="uniqueCodeInput" 
-                                placeholder="Enter your unique verification code"
-                                class="form-input"
-                            >
-                            <button type="button" id="toggleCodeVisibility" class="toggle-btn">
-                                <i data-lucide="eye"></i>
-                            </button>
-                        </div>
-                    </div>
-                    
-                    <div class="form-actions">
-                        <button type="button" id="cancelBtn" class="cancel-btn">CANCEL</button>
-                        <button type="submit" id="verifyBtn" class="verify-btn">
-                            <i data-lucide="shield"></i>
-                            <span>VERIFY</span>
-                        </button>
-                    </div>
-                </form>
-                
-                <!-- Warning Notice -->
-                <div class="warning-notice">
-                    <p>⚠️ SECURE CHANNEL ENABLED</p>
-                    <p>Authentication attempt will be logged</p>
-                </div>
-            </div>
-            
-            <!-- Animated border -->
-            <div class="modal-border"></div>
-        </div>
-    </div>
-    
-    <!-- Toast Notifications -->
-    <div id="toastContainer" class="toast-container"></div>
-    
-    <script src="script.js"></script>
-</body>
+
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
 </html>
