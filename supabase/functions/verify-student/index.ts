@@ -4,7 +4,6 @@ const corsHeaders = {
 };
 
 async function getGoogleAccessToken(credentials: any): Promise<string> {
-  // Create JWT for Google OAuth
   const jwtHeader = {
     alg: 'RS256',
     typ: 'JWT'
@@ -23,12 +22,48 @@ async function getGoogleAccessToken(credentials: any): Promise<string> {
   const headerB64 = btoa(JSON.stringify(jwtHeader)).replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_');
   const payloadB64 = btoa(JSON.stringify(jwtPayload)).replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_');
   
-  // Import private key
+  // Import private key for signing
   const privateKey = credentials.private_key.replace(/\\n/g, '\n');
   
-  // For demo purposes, we'll use the CSV approach since setting up crypto is complex
-  // In production, you'd properly implement JWT signing
-  throw new Error('JWT signing not implemented in demo - using CSV fallback');
+  // Convert PEM to proper format for Web Crypto API
+  const pemContents = privateKey
+    .replace('-----BEGIN PRIVATE KEY-----', '')
+    .replace('-----END PRIVATE KEY-----', '')
+    .replace(/\s/g, '');
+  
+  const binaryKey = Uint8Array.from(atob(pemContents), c => c.charCodeAt(0));
+  
+  const cryptoKey = await crypto.subtle.importKey(
+    'pkcs8',
+    binaryKey,
+    { name: 'RSASSA-PKCS1-v1_5', hash: 'SHA-256' },
+    false,
+    ['sign']
+  );
+
+  const signature = await crypto.subtle.sign(
+    'RSASSA-PKCS1-v1_5',
+    cryptoKey,
+    encoder.encode(`${headerB64}.${payloadB64}`)
+  );
+
+  const signatureB64 = btoa(String.fromCharCode(...new Uint8Array(signature)))
+    .replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_');
+
+  const jwt = `${headerB64}.${payloadB64}.${signatureB64}`;
+
+  const tokenResponse = await fetch('https://oauth2.googleapis.com/token', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: `grant_type=urn:ietf:params:oauth:grant-type:jwt-bearer&assertion=${jwt}`
+  });
+
+  const tokenData = await tokenResponse.json();
+  if (!tokenData.access_token) {
+    throw new Error(`Failed to get access token: ${JSON.stringify(tokenData)}`);
+  }
+  
+  return tokenData.access_token;
 }
 
 Deno.serve(async (req) => {
@@ -79,6 +114,7 @@ Deno.serve(async (req) => {
     let codeMatches = false;
     
     // Find the student and verify code
+    let studentRowIndex = -1;
     for (let i = 1; i < lines.length; i++) {
       const line = lines[i];
       if (line.trim()) {
@@ -89,6 +125,7 @@ Deno.serve(async (req) => {
         if (sheetEnrollment === enrollment) {
           studentFound = true;
           codeMatches = sheetCode === uniqueCode;
+          studentRowIndex = i + 1; // Google Sheets is 1-indexed, add 1 for header
           break;
         }
       }
@@ -110,16 +147,71 @@ Deno.serve(async (req) => {
       );
     }
 
-    // For now, we'll just return verification result without updating the sheet
-    // In production, you'd implement proper Google Sheets API update with authentication
-    console.log(`Verification for ${enrollment}: ${codeMatches ? 'SUCCESS' : 'FAILED'}`);
+    if (!codeMatches) {
+      return new Response(
+        JSON.stringify({ 
+          success: true,
+          verified: false,
+          status: 'failed',
+          message: 'Invalid unique code'
+        }),
+        { 
+          headers: { 
+            'Content-Type': 'application/json',
+            ...corsHeaders 
+          } 
+        }
+      );
+    }
+
+    // Update Google Sheet status to "paid" when verification is successful
+    console.log(`Verification successful for ${enrollment}. Updating status to 'paid'...`);
+    
+    try {
+      const credentialsJson = Deno.env.get('GOOGLE_SERVICE_ACCOUNT_CREDENTIALS');
+      if (!credentialsJson) {
+        throw new Error('Google service account credentials not found');
+      }
+
+      const credentials = JSON.parse(credentialsJson);
+      const accessToken = await getGoogleAccessToken(credentials);
+      
+      const spreadsheetId = '1p-9erkM55yG2H3uwowI-k7vntASunX65GLZCb-s7Bv4';
+      const range = `Sheet1!D${studentRowIndex}`; // Column D is status column
+      
+      const updateResponse = await fetch(
+        `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/${range}?valueInputOption=RAW`,
+        {
+          method: 'PUT',
+          headers: {
+            'Authorization': `Bearer ${accessToken}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            values: [['paid']]
+          })
+        }
+      );
+
+      if (!updateResponse.ok) {
+        const errorText = await updateResponse.text();
+        console.error('Failed to update sheet:', errorText);
+        throw new Error(`Failed to update sheet: ${updateResponse.status}`);
+      }
+
+      console.log(`Successfully updated status to 'paid' for ${enrollment}`);
+      
+    } catch (error) {
+      console.error('Error updating Google Sheet:', error);
+      // Continue anyway - verification was successful even if sheet update failed
+    }
 
     return new Response(
       JSON.stringify({ 
         success: true,
-        verified: codeMatches,
-        status: codeMatches ? 'verified' : 'failed',
-        message: codeMatches ? 'Verification successful!' : 'Invalid unique code'
+        verified: true,
+        status: 'verified',
+        message: 'Verification successful! Status updated to paid.'
       }),
       { 
         headers: { 

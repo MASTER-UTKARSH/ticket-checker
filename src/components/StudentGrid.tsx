@@ -1,6 +1,8 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Button } from "@/components/ui/button";
-import { RefreshCw, Users, Database, Clock } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { RefreshCw, Users, Database, Clock, Search, Filter } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import StudentCard from "./StudentCard";
@@ -21,6 +23,8 @@ const StudentGrid = () => {
   const [studentsData, setStudentsData] = useState<StudentsData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [lastRefresh, setLastRefresh] = useState<Date>(new Date());
+  const [searchTerm, setSearchTerm] = useState("");
+  const [sortFilter, setSortFilter] = useState("all");
   const { toast } = useToast();
 
   const fetchStudents = async () => {
@@ -96,6 +100,43 @@ const StudentGrid = () => {
 
   const stats = getStatusCounts();
 
+  // Filter and sort students based on search term and sort filter
+  const filteredAndSortedStudents = useMemo(() => {
+    if (!studentsData?.students) return [];
+
+    let filtered = studentsData.students;
+
+    // Apply search filter (enrollment number)
+    if (searchTerm) {
+      filtered = filtered.filter(student => 
+        student.enrollment.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+
+    // Apply status filter
+    if (sortFilter !== "all") {
+      filtered = filtered.filter(student => {
+        const status = student.status.toLowerCase();
+        if (sortFilter === "paid") return status === "paid" || status === "verified";
+        if (sortFilter === "unpaid") return status === "unpaid" || status === "pending" || status === "failed";
+        return true;
+      });
+    }
+
+    // Sort by status (paid first, then unpaid)
+    return filtered.sort((a, b) => {
+      const statusA = a.status.toLowerCase();
+      const statusB = b.status.toLowerCase();
+      
+      const isPaidA = statusA === "paid" || statusA === "verified";
+      const isPaidB = statusB === "paid" || statusB === "verified";
+      
+      if (isPaidA && !isPaidB) return -1;
+      if (!isPaidA && isPaidB) return 1;
+      return a.enrollment.localeCompare(b.enrollment);
+    });
+  }, [studentsData?.students, searchTerm, sortFilter]);
+
   return (
     <div className="space-y-6">
       {/* Header with stats and controls */}
@@ -116,7 +157,34 @@ const StudentGrid = () => {
           </div>
         </div>
 
-        <div className="flex items-center space-x-4">
+        <div className="flex flex-col lg:flex-row lg:items-center space-y-4 lg:space-y-0 lg:space-x-4">
+          {/* Search and Filter Controls */}
+          <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3">
+            {/* Search Bar */}
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <Input
+                placeholder="Search by enrollment..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10 cyberpunk-border bg-background/50 font-mono"
+              />
+            </div>
+
+            {/* Sort Filter */}
+            <Select value={sortFilter} onValueChange={setSortFilter}>
+              <SelectTrigger className="w-40 cyberpunk-border bg-background/50 font-mono">
+                <Filter className="w-4 h-4 mr-2" />
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Students</SelectItem>
+                <SelectItem value="paid">Paid Only</SelectItem>
+                <SelectItem value="unpaid">Unpaid Only</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
           {/* Status Stats */}
           <div className="flex space-x-2 text-xs font-mono">
             <div className="px-2 py-1 rounded bg-success/20 text-success border border-success/30">
@@ -175,10 +243,21 @@ const StudentGrid = () => {
         </div>
       )}
 
-      {/* Students Grid */}
+      {/* Results Info */}
       {studentsData?.students && (
+        <div className="flex items-center justify-between">
+          <p className="text-sm text-muted-foreground font-mono">
+            Showing {filteredAndSortedStudents.length} of {studentsData.students.length} students
+            {searchTerm && ` matching "${searchTerm}"`}
+            {sortFilter !== "all" && ` (${sortFilter} only)`}
+          </p>
+        </div>
+      )}
+
+      {/* Students Grid */}
+      {filteredAndSortedStudents.length > 0 && (
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {studentsData.students.map((student, index) => (
+          {filteredAndSortedStudents.map((student, index) => (
             <div
               key={student.enrollment}
               className="animate-slide-up"
@@ -193,6 +272,27 @@ const StudentGrid = () => {
               />
             </div>
           ))}
+        </div>
+      )}
+
+      {/* Empty Search Results */}
+      {studentsData?.students && filteredAndSortedStudents.length === 0 && studentsData.students.length > 0 && (
+        <div className="text-center py-12">
+          <Search className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
+          <h3 className="text-xl font-mono text-muted-foreground">NO MATCHES FOUND</h3>
+          <p className="text-muted-foreground">
+            No students match your search criteria
+          </p>
+          <Button 
+            onClick={() => {
+              setSearchTerm("");
+              setSortFilter("all");
+            }}
+            variant="outline" 
+            className="mt-4 cyberpunk-border"
+          >
+            Clear Filters
+          </Button>
         </div>
       )}
 
