@@ -8,6 +8,7 @@ interface Student {
   name: string;
   uniqueCode: string;
   status: string;
+  seat: string;
 }
 
 async function getGoogleAccessToken(credentials: any): Promise<string> {
@@ -92,11 +93,12 @@ Deno.serve(async (req) => {
         // Handle CSV parsing with potential commas in quoted fields
         const columns = line.split(',').map(col => col.trim().replace(/^"|"$/g, ''));
         if (columns.length >= 4) {
-          students.push({
+        students.push({
             enrollment: columns[0] || '',
             name: columns[1] || '',
             uniqueCode: columns[2] || '',
-            status: columns[3] || 'pending'
+            status: columns[3] || 'pending',
+            seat: columns[4] || ''
           });
         }
       }

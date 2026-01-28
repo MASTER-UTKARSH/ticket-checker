@@ -12,6 +12,7 @@ interface Student {
   name: string;
   uniqueCode: string;
   status: string;
+  seat: string;
 }
 
 interface StudentsData {
