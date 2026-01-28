@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Shield, ShieldCheck, ShieldX, User, Hash } from "lucide-react";
+import { Shield, ShieldCheck, ShieldX, User, Hash, Armchair } from "lucide-react";
 import VerifyModal from "./VerifyModal";
 
 interface Student {
@@ -9,6 +9,7 @@ interface Student {
   name: string;
   uniqueCode: string;
   status: string;
+  seat: string;
 }
 
 interface StudentCardProps {
@@ -111,6 +112,12 @@ const StudentCard = ({ student, onVerificationComplete }: StudentCardProps) => {
                 <Hash className="w-4 h-4" />
                 <span className="font-mono text-sm">{student.enrollment}</span>
               </div>
+              {student.seat && (
+                <div className="flex items-center space-x-2 text-primary mt-1">
+                  <Armchair className="w-4 h-4" />
+                  <span className="font-mono text-sm font-bold">Seat: {student.seat}</span>
+                </div>
+              )}
             </div>
           </div>
 
