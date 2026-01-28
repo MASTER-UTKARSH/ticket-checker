@@ -3,19 +3,16 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-// Generate a random seat number (e.g., A1-J20)
+// Generate a random bus seat number (1-30)
 function generateRandomSeat(existingSeats: Set<string>): string {
-  const rows = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'];
-  const maxSeatsPerRow = 20;
-  
+  const maxSeats = 30;
   let seat = '';
   let attempts = 0;
-  const maxAttempts = 200;
+  const maxAttempts = 50;
   
   do {
-    const row = rows[Math.floor(Math.random() * rows.length)];
-    const seatNum = Math.floor(Math.random() * maxSeatsPerRow) + 1;
-    seat = `${row}${seatNum}`;
+    const seatNum = Math.floor(Math.random() * maxSeats) + 1;
+    seat = String(seatNum);
     attempts++;
   } while (existingSeats.has(seat) && attempts < maxAttempts);
   
