@@ -112,7 +112,7 @@ const StudentCard = ({ student, onVerificationComplete }: StudentCardProps) => {
                 <Hash className="w-4 h-4" />
                 <span className="font-mono text-sm">{student.enrollment}</span>
               </div>
-              {student.seat && (
+              {student.status.toLowerCase() === 'verified' && student.seat && (
                 <div className="flex items-center space-x-2 text-primary mt-2 p-2 bg-primary/10 rounded-lg border border-primary/30">
                   <Armchair className="w-4 h-4" />
                   <span className="font-mono text-sm font-bold">Your allocated seat number: {student.seat}</span>
