@@ -3,9 +3,9 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-// Generate a random bus seat number (1-30)
+// Generate a random bus seat number (1-40)
 function generateRandomSeat(existingSeats: Set<string>): string {
-  const maxSeats = 30;
+  const maxSeats = 40;
   let seat = '';
   let attempts = 0;
   const maxAttempts = 50;
