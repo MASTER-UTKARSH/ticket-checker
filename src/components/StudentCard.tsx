@@ -21,9 +21,16 @@ const StudentCard = ({ student, onVerificationComplete }: StudentCardProps) => {
   const [showVerifyModal, setShowVerifyModal] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
 
+  const status = (student.status ?? "").toLowerCase();
+  // In the sheet, successful verification may be marked as "paid".
+  const isVerifiedLike = status === "verified" || status === "paid";
+  const isFailed = status === "failed";
+  const isPendingLike = !isVerifiedLike && !isFailed;
+
   const getStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
       case 'verified':
+      case 'paid':
         return 'default'; // Will be styled with success colors via className
       case 'failed':
         return 'destructive';
@@ -35,6 +42,7 @@ const StudentCard = ({ student, onVerificationComplete }: StudentCardProps) => {
   const getStatusIcon = (status: string) => {
     switch (status.toLowerCase()) {
       case 'verified':
+      case 'paid':
         return <ShieldCheck className="w-4 h-4" />;
       case 'failed':
         return <ShieldX className="w-4 h-4" />;
@@ -61,10 +69,10 @@ const StudentCard = ({ student, onVerificationComplete }: StudentCardProps) => {
   const cardClass = `
     relative p-6 rounded-xl border border-border bg-card/50 backdrop-blur-sm
     transition-all duration-300 hover:scale-[1.02] hover:shadow-lg
-    ${student.status === 'verified' ? 'cyberpunk-border glow-success animate-pulse-glow' : ''}
-    ${student.status === 'failed' ? 'cyberpunk-border glow-destructive' : ''}
-    ${isAnimating && student.status === 'verified' ? 'animate-status-verified' : ''}
-    ${isAnimating && student.status === 'failed' ? 'animate-status-failed' : ''}
+    ${isVerifiedLike ? 'cyberpunk-border glow-success animate-pulse-glow' : ''}
+    ${isFailed ? 'cyberpunk-border glow-destructive' : ''}
+    ${isAnimating && isVerifiedLike ? 'animate-status-verified' : ''}
+    ${isAnimating && isFailed ? 'animate-status-failed' : ''}
     group
   `;
 
@@ -72,7 +80,7 @@ const StudentCard = ({ student, onVerificationComplete }: StudentCardProps) => {
     <>
       <div className={cardClass}>
         {/* Animated background gradient for verified students */}
-        {student.status === 'verified' && (
+        {isVerifiedLike && (
           <div className="absolute inset-0 bg-gradient-to-br from-success/10 via-transparent to-primary/10 rounded-xl" />
         )}
         
@@ -90,7 +98,7 @@ const StudentCard = ({ student, onVerificationComplete }: StudentCardProps) => {
             <Badge 
               variant={getStatusColor(student.status)}
               className={`flex items-center space-x-1 animate-slide-up ${
-                student.status.toLowerCase() === 'verified' 
+                isVerifiedLike
                   ? 'bg-success text-success-foreground border-success' 
                   : ''
               }`}
@@ -112,7 +120,7 @@ const StudentCard = ({ student, onVerificationComplete }: StudentCardProps) => {
                 <Hash className="w-4 h-4" />
                 <span className="font-mono text-sm">{student.enrollment}</span>
               </div>
-              {student.status.toLowerCase() === 'verified' && student.seat && (
+              {isVerifiedLike && student.seat && (
                 <div className="flex items-center justify-center space-x-3 text-success mt-3 p-3 bg-success/20 rounded-lg border-2 border-success/50 shadow-glow-success animate-fade-in">
                   <Armchair className="w-5 h-5" />
                   <span className="font-mono text-base font-bold">Your allocated seat number: {student.seat}</span>
@@ -123,7 +131,7 @@ const StudentCard = ({ student, onVerificationComplete }: StudentCardProps) => {
 
           {/* Action Button */}
           <div className="pt-2">
-            {student.status === 'verified' ? (
+            {isVerifiedLike ? (
               <Button 
                 variant="outline" 
                 className="w-full bg-success/10 border-success text-success hover:bg-success hover:text-success-foreground"
@@ -132,7 +140,7 @@ const StudentCard = ({ student, onVerificationComplete }: StudentCardProps) => {
                 <ShieldCheck className="w-4 h-4 mr-2" />
                 VERIFIED
               </Button>
-            ) : student.status === 'failed' ? (
+            ) : isFailed ? (
               <Button 
                 variant="outline"
                 onClick={handleVerifyClick}
@@ -154,7 +162,7 @@ const StudentCard = ({ student, onVerificationComplete }: StudentCardProps) => {
         </div>
 
         {/* Scan line effect for pending students */}
-        {student.status === 'pending' && (
+        {isPendingLike && (
           <div className="absolute top-0 left-0 w-full h-0.5 bg-gradient-to-r from-transparent via-primary to-transparent animate-pulse" />
         )}
       </div>
