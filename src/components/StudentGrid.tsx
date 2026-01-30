@@ -1,8 +1,9 @@
 import { useState, useEffect, useMemo } from "react";
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { RefreshCw, Users, Database, Clock, Search, Filter } from "lucide-react";
+import { RefreshCw, Users, Database, Clock, Search, Filter, LayoutGrid } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import StudentCard from "./StudentCard";
@@ -198,6 +199,17 @@ const StudentGrid = () => {
               ◯ {stats.pending}
             </div>
           </div>
+
+          {/* Seat Chart Link */}
+          <Link to="/seats">
+            <Button
+              variant="outline"
+              className="cyberpunk-border hover:shadow-glow-cyan transition-all duration-300"
+            >
+              <LayoutGrid className="w-4 h-4 mr-2" />
+              <span className="font-mono uppercase">SEAT CHART</span>
+            </Button>
+          </Link>
 
           {/* Refresh Button */}
           <Button
