@@ -67,104 +67,88 @@ const StudentCard = ({ student, onVerificationComplete }: StudentCardProps) => {
   };
 
   const cardClass = `
-    relative p-6 rounded-xl border border-border bg-card/50 backdrop-blur-sm
-    transition-all duration-300 hover:scale-[1.02] hover:shadow-lg
-    ${isVerifiedLike ? 'cyberpunk-border glow-success animate-pulse-glow' : ''}
-    ${isFailed ? 'cyberpunk-border glow-destructive' : ''}
-    ${isAnimating && isVerifiedLike ? 'animate-status-verified' : ''}
-    ${isAnimating && isFailed ? 'animate-status-failed' : ''}
-    group
+    relative p-4 sm:p-6 rounded-xl border bg-card
+    transition-all duration-200
+    ${isVerifiedLike ? 'border-success bg-success/5' : ''}
+    ${isFailed ? 'border-destructive bg-destructive/5' : ''}
+    ${isPendingLike ? 'border-border' : ''}
   `;
 
   return (
     <>
       <div className={cardClass}>
-        {/* Animated background gradient for verified students */}
-        {isVerifiedLike && (
-          <div className="absolute inset-0 bg-gradient-to-br from-success/10 via-transparent to-primary/10 rounded-xl" />
-        )}
         
-        {/* Glowing corner accents */}
-        <div className="absolute top-0 left-0 w-8 h-8 border-l-2 border-t-2 border-primary rounded-tl-xl opacity-60 group-hover:opacity-100 transition-opacity" />
-        <div className="absolute bottom-0 right-0 w-8 h-8 border-r-2 border-b-2 border-accent rounded-br-xl opacity-60 group-hover:opacity-100 transition-opacity" />
-        
-        <div className="relative z-10 space-y-4">
+        <div className="space-y-3">
           {/* Header with status */}
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
-              <User className="w-5 h-5 text-primary" />
-              <span className="font-mono text-sm text-muted-foreground">STUDENT</span>
+              <User className="w-4 h-4 text-muted-foreground" />
+              <span className="text-xs text-muted-foreground uppercase tracking-wide">Student</span>
             </div>
             <Badge 
               variant={getStatusColor(student.status)}
-              className={`flex items-center space-x-1 animate-slide-up ${
+              className={`flex items-center gap-1 text-xs ${
                 isVerifiedLike
-                  ? 'bg-success text-success-foreground border-success' 
+                  ? 'bg-success text-success-foreground' 
                   : ''
               }`}
             >
               {getStatusIcon(student.status)}
-              <span className="uppercase font-mono text-xs">
+              <span className="uppercase">
                 {student.status || 'pending'}
               </span>
             </Badge>
           </div>
 
           {/* Student Info */}
-          <div className="space-y-3">
-            <div>
-              <h3 className="text-xl font-bold gradient-text mb-1">
-                {student.name}
-              </h3>
-              <div className="flex items-center space-x-2 text-muted-foreground">
-                <Hash className="w-4 h-4" />
-                <span className="font-mono text-sm">{student.enrollment}</span>
-              </div>
-              {isVerifiedLike && student.seat && (
-                <div className="flex items-center justify-center space-x-3 text-success mt-3 p-3 bg-success/20 rounded-lg border-2 border-success/50 shadow-glow-success animate-fade-in">
-                  <Armchair className="w-5 h-5" />
-                  <span className="font-mono text-base font-bold">Your allocated seat number: {student.seat}</span>
-                </div>
-              )}
+          <div className="space-y-2">
+            <h3 className="text-lg font-semibold text-foreground">
+              {student.name}
+            </h3>
+            <div className="flex items-center space-x-2 text-muted-foreground">
+              <Hash className="w-3.5 h-3.5" />
+              <span className="text-sm">{student.enrollment}</span>
             </div>
+            {isVerifiedLike && student.seat && (
+              <div className="flex items-center justify-center gap-2 text-success mt-2 p-2.5 bg-success/10 rounded-lg border border-success/30">
+                <Armchair className="w-4 h-4" />
+                <span className="text-sm font-medium">Seat: {student.seat}</span>
+              </div>
+            )}
           </div>
 
           {/* Action Button */}
-          <div className="pt-2">
+          <div className="pt-1">
             {isVerifiedLike ? (
               <Button 
                 variant="outline" 
-                className="w-full bg-success/10 border-success text-success hover:bg-success hover:text-success-foreground"
+                className="w-full bg-success/10 border-success text-success text-sm h-9"
                 disabled
               >
-                <ShieldCheck className="w-4 h-4 mr-2" />
-                VERIFIED
+                <ShieldCheck className="w-4 h-4 mr-1.5" />
+                Verified
               </Button>
             ) : isFailed ? (
               <Button 
                 variant="outline"
                 onClick={handleVerifyClick}
-                className="w-full bg-destructive/10 border-destructive text-destructive hover:bg-destructive hover:text-destructive-foreground"
+                className="w-full bg-destructive/10 border-destructive text-destructive text-sm h-9"
               >
-                <ShieldX className="w-4 h-4 mr-2" />
-                RETRY VERIFICATION
+                <ShieldX className="w-4 h-4 mr-1.5" />
+                Retry
               </Button>
             ) : (
               <Button 
                 onClick={handleVerifyClick}
-                className="w-full bg-gradient-primary text-background hover:shadow-glow-cyan transition-all duration-300 font-mono uppercase tracking-wider"
+                className="w-full text-sm h-9"
               >
-                <Shield className="w-4 h-4 mr-2" />
-                VERIFY YOURSELF
+                <Shield className="w-4 h-4 mr-1.5" />
+                Verify
               </Button>
             )}
           </div>
         </div>
 
-        {/* Scan line effect for pending students */}
-        {isPendingLike && (
-          <div className="absolute top-0 left-0 w-full h-0.5 bg-gradient-to-r from-transparent via-primary to-transparent animate-pulse" />
-        )}
       </div>
 
       <VerifyModal
